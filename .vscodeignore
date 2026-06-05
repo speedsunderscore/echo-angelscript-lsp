@@ -1,6 +1,10 @@
 .vscode/**
 .vscode-test/**
 .claude/**
+*.zip
+ascii-sweep.cjs
+xfile-test.cjs
+smoke-test.cjs
 **/*.ts
 **/*.map
 **/tsconfig.json

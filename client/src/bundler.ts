@@ -54,6 +54,11 @@ export async function runBundle(): Promise<void> {
     return;
   }
 
+  // Flush every dirty editor to disk so the bundler reads the current
+  // buffer contents rather than the last-saved version. saveAll(false)
+  // skips untitled files (they have no path on disk).
+  await vscode.workspace.saveAll(false);
+
   try {
     const fileCount = await bundle(srcDir, outputFile, settings.strip);
     vscode.window.showInformationMessage(
