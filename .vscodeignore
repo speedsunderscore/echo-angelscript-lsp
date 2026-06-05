@@ -1,0 +1,16 @@
+.vscode/**
+.vscode-test/**
+.claude/**
+**/*.ts
+**/*.map
+**/tsconfig.json
+**/tsconfig.base.json
+**/.eslintrc.json
+**/*.tsbuildinfo
+**/node_modules/typescript/**
+**/node_modules/@types/**
+node_modules/echo-angelscript-lsp-client/**
+node_modules/echo-angelscript-lsp-server/**
+.gitignore
+client/src/**
+server/src/**

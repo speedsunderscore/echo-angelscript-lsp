@@ -1,0 +1,127 @@
+{
+  "name": "echo-angelscript-lsp",
+  "displayName": "Echo AngelScript LSP",
+  "description": "Language support for AngelScript with the Echo API.",
+  "version": "0.0.1",
+  "publisher": "underscore",
+  "author": {
+    "name": "underscore"
+  },
+  "license": "MIT",
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/speedsunderscore/echo-angelscript-lsp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/speedsunderscore/echo-angelscript-lsp/issues"
+  },
+  "homepage": "https://github.com/speedsunderscore/echo-angelscript-lsp#readme",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "main": "./client/out/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "languages": [
+      {
+        "id": "angelscript",
+        "aliases": [
+          "AngelScript",
+          "angelscript"
+        ],
+        "extensions": [
+          ".as"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "angelscript",
+        "scopeName": "source.angelscript",
+        "path": "./syntaxes/angelscript.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Echo AngelScript",
+      "properties": {
+        "echoAngelscript.trace.server": {
+          "scope": "window",
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Trace communication between VSCode and the AngelScript language server."
+        },
+        "echoAngelscript.maxNumberOfProblems": {
+          "scope": "resource",
+          "type": "number",
+          "default": 1000,
+          "description": "Maximum number of problems reported per file."
+        },
+        "echoAngelscript.bundler.source": {
+          "scope": "resource",
+          "type": "string",
+          "default": "source",
+          "description": "Source directory containing .as files. Relative to the workspace root, or an absolute path."
+        },
+        "echoAngelscript.bundler.output": {
+          "scope": "resource",
+          "type": "string",
+          "default": "bundled.as",
+          "description": "Output file path for the bundle. Relative to the workspace root, or an absolute path."
+        },
+        "echoAngelscript.bundler.strip": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "description": "Strip comment-only lines from the bundled output."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "echoAngelscript.bundle",
+        "title": "Bundle Project",
+        "category": "Echo AngelScript"
+      },
+      {
+        "command": "echoAngelscript.configureBundler",
+        "title": "Configure Bundler...",
+        "category": "Echo AngelScript"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "echoAngelscript.bundle",
+        "key": "ctrl+shift+b",
+        "mac": "cmd+shift+b",
+        "when": "editorLangId == angelscript"
+      }
+    ]
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -b",
+    "watch": "tsc -b -w",
+    "clean": "tsc -b --clean",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@vscode/vsce": "^2.24.0",
+    "typescript": "^5.4.0"
+  }
+}
