@@ -397,6 +397,19 @@ export class Analyzer {
       case 'LiteralExpr':
       case 'ThisExpr':
         return;
+
+      case 'InitListExpr': {
+        for (const el of expr.elements) this.resolveExpr(el, scope);
+        return;
+      }
+
+      case 'AnonymousFunctionExpr': {
+        if (expr.returnType) this.resolveType(expr.returnType, scope);
+        const fnScope = scope.pushChild('function', { start: expr.start, end: expr.end });
+        for (const p of expr.params) this.resolveParameter(p, scope, fnScope);
+        for (const s of expr.body.statements) this.resolveStmt(s, fnScope);
+        return;
+      }
     }
   }
 

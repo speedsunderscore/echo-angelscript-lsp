@@ -1186,6 +1186,26 @@ export class Parser {
       };
     }
 
+    if (this.checkKeyword('function')) {
+      const fnStart = this.advance();
+      const params = this.parseParameterList();
+      // Optional explicit return type before the body. `{` ends the
+      // signature; anything else (an identifier / primitive type) is a
+      // return type that we parse as a TypeRef.
+      let returnType: TypeRef | null = null;
+      if (!this.check(TokenKind.LBrace)) {
+        returnType = this.parseTypeRef();
+      }
+      const body = this.parseBlock();
+      return {
+        kind: 'AnonymousFunctionExpr',
+        params,
+        returnType,
+        body,
+        ...this.rangeOf(fnStart, this.previous()),
+      };
+    }
+
     if (this.matchKeyword('new')) {
       const type = this.parseTypeRef();
       const args: Expression[] = [];

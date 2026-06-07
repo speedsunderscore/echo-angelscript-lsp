@@ -302,6 +302,17 @@ export class TypeChecker {
             return l;
         }
       }
+
+      case 'AnonymousFunctionExpr': {
+        // Walk the body so inner expressions get typed.
+        const fnScope = this.scopeAt(expr.start);
+        for (const s of expr.body.statements) this.checkStmt(s);
+        // We don't synthesize a full FunctionType here yet -- AS callsites
+        // that take a funcdef@ accept anonymous functions structurally;
+        // returning UNKNOWN keeps things working without a sema layer.
+        void fnScope;
+        return UNKNOWN;
+      }
     }
   }
 

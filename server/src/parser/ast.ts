@@ -53,7 +53,8 @@ export type NodeKind =
   | 'QualifiedName'
   | 'LiteralExpr'
   | 'ThisExpr'
-  | 'InitListExpr';
+  | 'InitListExpr'
+  | 'AnonymousFunctionExpr';
 
 export interface NodeBase {
   kind: NodeKind;
@@ -413,6 +414,18 @@ export interface InitListExpr extends NodeBase {
   elements: Expression[];
 }
 
+/**
+ * Anonymous function expression: `function(params) [returnType] { body }`.
+ * Commonly used as an inline callback argument.
+ */
+export interface AnonymousFunctionExpr extends NodeBase {
+  kind: 'AnonymousFunctionExpr';
+  params: Parameter[];
+  /** Optional explicit return type; null when AS infers from the body. */
+  returnType: TypeRef | null;
+  body: BlockStmt;
+}
+
 // ----- aggregate unions --------------------------------------------------
 
 export type Declaration =
@@ -457,7 +470,8 @@ export type Expression =
   | QualifiedName
   | LiteralExpr
   | ThisExpr
-  | InitListExpr;
+  | InitListExpr
+  | AnonymousFunctionExpr;
 
 export type AnyNode =
   | Module
