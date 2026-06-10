@@ -395,18 +395,38 @@ export class Parser {
     const name = this.consumeName('Expected declaration name.').value;
 
     if (this.check(TokenKind.LParen)) {
-      const params = this.parseParameterList();
-      const { body, isConst } = this.parseFunctionTail();
-      return [{
-        kind: 'FunctionDecl',
-        name,
-        modifiers,
-        returnType: type,
-        params,
-        isConst,
-        body,
-        ...this.rangeOf(startTok, this.previous()),
-      }];
+      // `Type name(...)` is ambiguous at this position:
+      //   - function declaration: `Type name(Type p1, ...) { body }` or `;`
+      //   - variable with constructor init: `Type name(arg1, arg2);`
+      // Speculatively try the function-decl path; on failure, rewind and
+      // fall through to the var-decl path (which uses parseOptionalInitializer
+      // to handle the constructor-call form).
+      const savedPos = this.pos;
+      const savedErrors = this.errors.length;
+      let params: Parameter[] | null = null;
+      try {
+        params = this.parseParameterList();
+      } catch (e) {
+        if (!(e instanceof ParseException)) throw e;
+        this.pos = savedPos;
+        this.errors.length = savedErrors;
+      }
+
+      if (params !== null) {
+        const { body, isConst } = this.parseFunctionTail();
+        return [{
+          kind: 'FunctionDecl',
+          name,
+          modifiers,
+          returnType: type,
+          params,
+          isConst,
+          body,
+          ...this.rangeOf(startTok, this.previous()),
+        }];
+      }
+      // Fall through to variable-decl path; parseOptionalInitializer
+      // consumes the `(args)` form below.
     }
 
     // Variable declaration (possibly multi-declarator).
@@ -1255,6 +1275,32 @@ export class Parser {
       while (this.match(TokenKind.ColonColon)) {
         pushPart(this.consumeName("Expected identifier after '::'."));
       }
+
+      // Templated constructor call: `Ident<T, U>(args)` — `<` would
+      // otherwise be parsed as a comparison operator. Only consume the
+      // template args if they end with `>(` so we don't break legitimate
+      // `a < b` comparisons. We discard the template-arg list here; the
+      // following `(` is picked up by parsePostfix as a regular call.
+      if (this.check(TokenKind.Lt)) {
+        const savePos = this.pos;
+        const saveErrs = this.errors.length;
+        let ok = false;
+        try {
+          this.advance(); // <
+          this.parseTypeRef();
+          while (this.match(TokenKind.Comma)) this.parseTypeRef();
+          this.consumeGreaterThan();
+          ok = this.check(TokenKind.LParen);
+        } catch (e) {
+          if (!(e instanceof ParseException)) throw e;
+          ok = false;
+        }
+        if (!ok) {
+          this.pos = savePos;
+          this.errors.length = saveErrs;
+        }
+      }
+
       const endTok = this.previous();
       if (parts.length === 1) {
         return { kind: 'Identifier', name: parts[0], ...this.rangeOf(t, endTok) };
