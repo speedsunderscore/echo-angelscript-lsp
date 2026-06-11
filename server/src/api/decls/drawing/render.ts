@@ -49,6 +49,18 @@ bool get_viewport_size(int &out width, int &out height);
  */
 void set_anti_aliasing(bool enabled);
 
+/** Overlay framerate (frames per second). Callable from any context. */
+float get_fps();
+
+/** Overlay frametime (milliseconds per frame). Callable from any context. */
+float get_frametime();
+
+/**
+ * True when the overlay is currently visible on-screen.
+ * Callable from any context.
+ */
+bool is_foreground();
+
 // -- Images -----------------------------------------------------------------
 
 /**

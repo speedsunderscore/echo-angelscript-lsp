@@ -2,7 +2,7 @@
   "name": "echo-angelscript-lsp",
   "displayName": "Echo AngelScript LSP",
   "description": "Language support for AngelScript with the Echo API.",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "publisher": "underscore",
   "author": {
     "name": "underscore"

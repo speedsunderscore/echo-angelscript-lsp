@@ -496,9 +496,20 @@ export class Parser {
       // Special case: `(void)` -- empty parameter list spelled with void.
       if (this.checkKeyword('void') && this.peekAt(1)?.kind === TokenKind.RParen) {
         this.advance();
+      } else if (this.check(TokenKind.Ellipsis)) {
+        // Bare `(...)` -- variadic marker, no fixed params.
+        this.advance();
       } else {
         params.push(this.parseParameter());
-        while (this.match(TokenKind.Comma)) params.push(this.parseParameter());
+        while (this.match(TokenKind.Comma)) {
+          // `...` after a comma terminates the parameter list (variadic tail
+          // as in util::format_string(string fmt, ...)).
+          if (this.check(TokenKind.Ellipsis)) {
+            this.advance();
+            break;
+          }
+          params.push(this.parseParameter());
+        }
       }
     }
     this.consume(TokenKind.RParen, "Expected ')' to close parameter list.");

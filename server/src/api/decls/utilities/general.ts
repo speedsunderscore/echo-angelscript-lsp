@@ -22,6 +22,32 @@ string wide_to_string(array<uint8> bytes, bool stop_at_null = false);
 /** Format an integer as a hex string; \`prefix\` prepends "0x". */
 string to_hex(uint64 value, bool prefix = true);
 
+/**
+ * Format a string using \`{}\` placeholders.
+ *
+ * Basic usage:
+ *   {}        next argument
+ *   {0}       argument by index
+ *   {{        literal {
+ *   }}        literal }
+ *
+ * Format options (after a colon):
+ *   {:<8}     left-align, width 8
+ *   {:>8}     right-align, width 8 (default)
+ *   {:08}     zero-pad, width 8
+ *   {:.2}     2 decimal places
+ *   {0:<8.2}  index + alignment + width + precision
+ *
+ * Shorthand (no colon needed):
+ *   {.2}      precision only
+ *   {0.3}     index + precision
+ *
+ * Invalid or out-of-range placeholders produce \`{?}\`.
+ * Width is capped at 1024, precision at 17.
+ * Up to 8 arguments supported.
+ */
+string format_string(string fmt, ...);
+
 // -- System time ------------------------------------------------------------
 
 /** Milliseconds since system boot. */
