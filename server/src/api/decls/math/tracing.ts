@@ -48,7 +48,10 @@ bvh_tree@ create_bvh_tree();
 
 namespace trace {
 
-/** Test a ray against a single triangle. */
+/**
+ * Moller-Trumbore intersection. Returns true if the ray hits the
+ * triangle within \`max_t\`.
+ */
 bool ray_triangle(
     const triangle &in tri,
     const vec3 &in origin,
@@ -56,13 +59,43 @@ bool ray_triangle(
     double max_t
 );
 
-/** Test a ray against an axis-aligned bounding box. */
+/**
+ * Slab-method AABB intersection. Returns true if the ray hits the box
+ * within \`max_t\`.
+ */
 bool ray_bbox(
     const vec3 &in origin,
     const vec3 &in dir,
-    double max_t,
     const vec3 &in box_min,
-    const vec3 &in box_max
+    const vec3 &in box_max,
+    double max_t
+);
+
+/**
+ * Analytic sphere intersection. Returns true if the ray hits the sphere
+ * within \`max_t\`.
+ */
+bool ray_sphere(
+    const vec3 &in origin,
+    const vec3 &in dir,
+    const vec3 &in center,
+    double radius,
+    double max_t
+);
+
+/**
+ * Closest-point capsule intersection. Returns true if the ray hits the
+ * capsule within \`max_t\`.
+ * \`capsule_min\` and \`capsule_max\` are the two endpoint centers of the
+ * capsule axis.
+ */
+bool ray_capsule(
+    const vec3 &in origin,
+    const vec3 &in dir,
+    const vec3 &in capsule_min,
+    const vec3 &in capsule_max,
+    double radius,
+    double max_t
 );
 
 }
