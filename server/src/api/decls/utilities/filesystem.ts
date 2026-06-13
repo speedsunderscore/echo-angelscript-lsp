@@ -24,6 +24,15 @@ bool append(string filename, string data);
 /** Read the file's contents into \`data\`. Returns false on failure. */
 bool read(string filename, string &out data);
 
+/** Write raw bytes to \`filename\`, replacing any existing content. */
+bool write_bytes(string filename, array<uint8> data);
+
+/** Append raw bytes to \`filename\` (creating if needed). */
+bool append_bytes(string filename, array<uint8> data);
+
+/** Read the file's contents as raw bytes. Returns null on failure. */
+array<uint8>@ read_bytes(string filename);
+
 /** Delete a file. Returns false if not present or unwritable. */
 bool remove(string filename);
 

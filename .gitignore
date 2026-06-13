@@ -4,4 +4,4 @@ out/
 .vscode-test/
 *.tsbuildinfo
 .claude/
-memory/
+/memory/
