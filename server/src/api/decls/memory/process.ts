@@ -37,6 +37,19 @@ class memory_buffer {
     /** Read a 64-bit double at \`offset\`. */
     double read_double(uint64 offset);
 
+    /** Read two consecutive 32-bit floats at \`offset\` into a vec2. */
+    vec2 read_vec2_float (uint64 offset);
+    /** Read two consecutive 64-bit doubles at \`offset\` into a vec2. */
+    vec2 read_vec2_double(uint64 offset);
+    /** Read three consecutive 32-bit floats at \`offset\` into a vec3. */
+    vec3 read_vec3_float (uint64 offset);
+    /** Read three consecutive 64-bit doubles at \`offset\` into a vec3. */
+    vec3 read_vec3_double(uint64 offset);
+    /** Read four consecutive 32-bit floats at \`offset\` into a vec4. */
+    vec4 read_vec4_float (uint64 offset);
+    /** Read four consecutive 64-bit doubles at \`offset\` into a vec4. */
+    vec4 read_vec4_double(uint64 offset);
+
     /** Total size of the buffer in bytes. */
     uint64 size();
 }
