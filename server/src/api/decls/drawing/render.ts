@@ -77,8 +77,18 @@ void draw_image(image obj, int x, int y, int w, int h, int r, int g, int b, int 
 
 // -- Text -------------------------------------------------------------------
 
-/** Update the active font and size. */
+/**
+ * Load a font from raw bytes (e.g. a .ttf read via file::read_bytes()).
+ * Returns true on success and writes the handle into \`out\`.
+ * Callable from any context.
+ */
+bool load_font(const array<uint8> &in data, font_handle &out result, font_hint hint = font_hint::AUTO);
+
+/** Update the active font and size, using a bundled font. */
 void update_font(fonts font, int size);
+
+/** Update the active font and size, using a user-loaded font_handle. */
+void update_font(font_handle font, int size);
 
 /**
  * Measure the rendered size of \`text\` with the current font.
