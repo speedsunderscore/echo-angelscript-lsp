@@ -127,6 +127,12 @@ attach_data attach(uint32 pid, bool attach_window = true);
  */
 bool is_alive();
 
+/**
+ * Detach from the currently attached process. Subsequent reads/writes
+ * fail until another attach() succeeds.
+ */
+void detach();
+
 // ---------------------------------------------------------------------------
 // Read memory -- value-returning. Returns a default (0 / 0.0 / false / "")
 // on failure.

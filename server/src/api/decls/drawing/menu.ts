@@ -146,6 +146,12 @@ void add_category(string label, category_pos pos);
 /** Fill \`binds\` with every currently active keybind. */
 bool get_active_binds(array<active_bind> &out binds);
 
+/** Label of the currently active top-level tab. */
+string get_tab();
+
+/** Label of the currently active sub-tab. Empty string if none. */
+string get_sub_tab();
+
 // -- Element creation -------------------------------------------------------
 
 /** Add a checkbox. */
