@@ -54,6 +54,23 @@ class memory_buffer {
     uint64 size();
 }
 
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+/** Commit state of a memory region, as reported by process::virtual_query. */
+enum memory_state {
+    MEM_COMMIT,
+    MEM_RESERVE
+}
+
+/** Backing store of a memory region, as reported by process::virtual_query. */
+enum memory_type {
+    MEM_PRIVATE,
+    MEM_MAPPED,
+    MEM_IMAGE
+}
+
 namespace process {
 
 // ---------------------------------------------------------------------------
@@ -88,11 +105,10 @@ class memory_region {
     uint64 size;
     /** Win32 PAGE_* protection flags (e.g. PAGE_READWRITE = 0x04). */
     uint32 protect;
-    /**
-     * Whether the region is privately owned by the process, as opposed to
-     * mapped or image-backed.
-     */
-    bool private_memory;
+    /** Whether the region is committed or merely reserved. */
+    memory_state state;
+    /** How the region is backed -- private, mapped, or image. */
+    memory_type type;
 }
 
 // ---------------------------------------------------------------------------
@@ -242,6 +258,9 @@ memory_region virtual_query(uint64 address);
 
 // ---------------------------------------------------------------------------
 // Module utilities
+//
+// Module names are read directly from kernel structures, so they resolve even
+// when Windows has swapped the target's pages out -- no restart required.
 // ---------------------------------------------------------------------------
 
 /** Returns the base address of the named module, or 0 if not found. */
@@ -298,6 +317,22 @@ array<uint64>@ find_signatures(uint64 base, string sig);
  *   \`inst_size\` -- total instruction size in bytes
  */
 uint64 get_relative_address(uint64 address, uint32 offset, uint32 inst_size);
+
+// ---------------------------------------------------------------------------
+// Remote socket
+// ---------------------------------------------------------------------------
+
+/**
+ * Open a WebSocket connection to \`url\` and start a background receive loop.
+ * Requires a process to be attached before calling. Returns false if no
+ * process is attached or a connection is already active -- only one
+ * connection may be open at a time.
+ *
+ * All communication is JSON over UTF-8 WebSocket frames. Every request must
+ * include a \`"type"\` string and an optional integer \`"id"\` (defaults to 0),
+ * which is sent back in all responses for correlating replies.
+ */
+bool open_socket(const string url);
 
 // ---------------------------------------------------------------------------
 // Dump to file -- all dumps saved under the "dmp" folder inside the scripts
