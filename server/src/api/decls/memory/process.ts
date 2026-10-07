@@ -54,23 +54,6 @@ class memory_buffer {
     uint64 size();
 }
 
-// ---------------------------------------------------------------------------
-// Enums
-// ---------------------------------------------------------------------------
-
-/** Commit state of a memory region, as reported by process::virtual_query. */
-enum memory_state {
-    MEM_COMMIT,
-    MEM_RESERVE
-}
-
-/** Backing store of a memory region, as reported by process::virtual_query. */
-enum memory_type {
-    MEM_PRIVATE,
-    MEM_MAPPED,
-    MEM_IMAGE
-}
-
 namespace process {
 
 // ---------------------------------------------------------------------------
@@ -97,43 +80,41 @@ class module_entry {
     uint64 size;
 }
 
-/** Result of virtual_query(). */
+/**
+ * Result of virtual_query(). Describes one contiguous run of pages sharing
+ * the same hardware page-table flags.
+ */
 class memory_region {
-    /** Base address of the region. */
+    /** Start of the contiguous region. */
     uint64 base;
     /** Size of the region in bytes. */
     uint64 size;
-    /** Win32 PAGE_* protection flags (e.g. PAGE_READWRITE = 0x04). */
-    uint32 protect;
-    /** Whether the region is committed or merely reserved. */
-    memory_state state;
-    /** How the region is backed -- private, mapped, or image. */
-    memory_type type;
+    /** True if the pages are mapped. */
+    bool present;
+    /** Hardware write permission. */
+    bool writable;
+    /** Hardware execute permission (NX bit). */
+    bool executable;
 }
 
 // ---------------------------------------------------------------------------
 // Attach / liveness
+//
+// The process API has direct access to physical memory: page protections and
+// copy-on-write have no effect, and the target is never injected into.
 // ---------------------------------------------------------------------------
 
 /**
- * Attach to a process by name. Does not inject or modify the target.
+ * Attach to a process by name.
  * Returns an attach_data; any field equal to zero indicates failure.
- *
- * \`attach_window\` defaults to true: the matching window is found and
- * attached automatically. Pass false to skip window attachment (it is also
- * skipped automatically if no window exists).
  */
-attach_data attach(string name, bool attach_window = true);
+attach_data attach(string name);
 
 /**
- * Attach to a process by PID. Does not inject or modify the target.
+ * Attach to a process by PID.
  * Returns an attach_data; any field equal to zero indicates failure.
- *
- * \`attach_window\` defaults to true: the matching window is found and
- * attached automatically. Pass false to skip window attachment (it is also
- * skipped automatically if no window exists).
  */
-attach_data attach(uint32 pid, bool attach_window = true);
+attach_data attach(uint32 pid);
 
 /**
  * Checks if the attached process is still alive.
@@ -253,7 +234,15 @@ bool write_double(uint64 address, double value);
 // Virtual query
 // ---------------------------------------------------------------------------
 
-/** Query the virtual memory region containing \`address\`. */
+/**
+ * Query the memory region containing \`address\`. Backed by the hypervisor, so
+ * the flags reported are the hardware page-table ones.
+ *
+ * Returns the contiguous run of pages with uniform flags around \`address\`.
+ * When \`present\` is false, \`base\`/\`size\` still describe the unmapped hole,
+ * so adding \`base + size\` walks to the next region -- enumerating every
+ * region including the gaps.
+ */
 memory_region virtual_query(uint64 address);
 
 // ---------------------------------------------------------------------------

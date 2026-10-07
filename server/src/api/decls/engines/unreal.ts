@@ -62,6 +62,8 @@ class ftransform {
 /**
  * Build a cached view state from a f_view_info. Pass vertical_fov = true
  * for games that require the alternate FOV solution.
+ *
+ * World-to-screen projection accounts for widescreen aspect ratios.
  */
 f_view_cache build_view_cache(f_view_info camera, bool vertical_fov = false);
 
